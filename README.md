@@ -1,7 +1,7 @@
 # Customer Embed Iframe
-Files to place on customers page with return form iframe. It listens to React clients/customers for document size changes.
+Files to place on customers page with iframe pointed to their Returns page. It listens to the React app for document size changes.
 
-## Example
+### Client Shopify template example
 ```liquid
 {% assign shop_url = 'https://360.postco.co/<shop_name>' %}
 
