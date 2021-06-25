@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
           iframe.scrollIntoView()
           height = initialHeight
         }
-        
-        console.log(`Height: ${height}, InitialHeight: ${initialHeight}`) 
         iframe.style.height = height + 'px';
       }
   }
