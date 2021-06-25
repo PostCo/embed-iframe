@@ -1,0 +1,4 @@
+#postco360-iframe {
+  min-height: 80vh;
+  transition: height 400ms ease-in;
+}
