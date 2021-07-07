@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
   console.log('Initial height > ', initialHeight)
   
 window.onmessage = (event) => {
-    if (event.origin.match(/[http[s]?:\/\/360\.postco\.co\/|ngrok/))
+    if (event.origin.match(/360\.postco\.co/))
     {	
       console.log('Parent received---', event.data)
       
