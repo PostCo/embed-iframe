@@ -1,4 +1,4 @@
-# Customer Embed Iframe
+# Embed Iframe
 Files to place on customers page with iframe pointed to their Returns page. It listens to the React app for document size changes.
 
 ### How it works
