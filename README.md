@@ -17,4 +17,17 @@ The parent window contains this JS code for listening to postMessages {object} s
 <!-- Files from this repo -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/PostCo/embed-iframe/iframe-listener.min.js"></script>
 ```
-### 
+
+### How to push a new version to jsdelivr
+- Make change(s) to the code, push it to the remote repo as usually.
+- Once the new code is merged into the `main` branch, draft a new release.
+  - Visit the repo on GitHub, go to Releases section (it sits between the About section and Packages section).
+  - Click "Draft a new release".
+  - Fill in the fields:
+    - Tag: create a new, incremented tag. For example, the latest release is `v1.0.4`, then the tag should be `v1.0.5`.
+    - Target: the main branch.
+    - Relase title: same as Tag.
+    - Description: self-explanatory.
+  - Check the "Set as the latest release".
+  - Click on "Draft a new release".
+- Once everything is reviewed and tested carefully, go to the Releases section, click on Edit icon of the draft release and click "Publish release".
