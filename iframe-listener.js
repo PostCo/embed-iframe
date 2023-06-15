@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
   console.log("Initial height > ", initialHeight);
 
   window.onmessage = (event) => {
-    if (event.origin.match(/360\.postco\.co/)) {
+    if (event.origin.match(/postco\.co/)) {
       console.log("Parent received---", event.data);
 
       let { type, height, isRoot, resetHeight } = event.data;
@@ -31,7 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
           iframe.style.height = height + "px";
         }
       } else if (type === "scrollToTop") {
-        iframe.scrollIntoView();
+        window.scrollTo(0, 0);
+        iframe.scrollTo(0, 0);
       }
     }
   };
