@@ -33,6 +33,21 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (type === "scrollToTop") {
         window.scrollTo(0, 0);
         iframe.scrollTo(0, 0);
+      } else if (type === "scrollUp") {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      } else if (type === "scrollDown") {
+        const iframeBottom = iframe.scrollHeight;
+        const viewportHeight = window.innerHeight;
+
+        window.scrollBy({
+          top: iframeBottom - viewportHeight + 300,
+          // Scroll down a little further (300px), so the users
+          // can see there is a footer below
+          behavior: "smooth"
+        });
       }
     }
   };
