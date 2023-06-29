@@ -20,6 +20,8 @@ The parent window contains this JS code for listening to postMessages {object} s
 
 ### How to push a new version to jsdelivr
 - Make change(s) to the code, push it to the remote repo as usually.
+- Once all the changes have been made, update the minified version of all the `.js` files.
+  - You can look for online JavaScript minifiers online like [Toptal's JavaScript Minifier](https://www.toptal.com/developers/javascript-minifier)
 - Once the new code is merged into the `main` branch, draft a new release.
   - Visit the repo on GitHub, go to Releases section (it sits between the About section and Packages section).
   - Click "Draft a new release".
