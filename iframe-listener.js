@@ -4,15 +4,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (params.has("disable-resize-observer") || !iframe) return;
 
+  addEventListener("scroll", () => {
+    const viewportBottom =
+      window.scrollY + document.documentElement.clientHeight;
+    const iframeBottom = iframe.offsetTop + iframe.offsetHeight;
+
+    iframe.contentWindow.postMessage(
+      {
+        type: "stickyBottomAppBarPosition",
+        data: viewportBottom < iframeBottom ? iframeBottom - viewportBottom : 0,
+      },
+      "*"
+    );
+  });
+  const repositionStickyBottomAppBar = () => {
+    window.dispatchEvent(new CustomEvent('scroll'));
+  };
+
   let shouldResize = true;
   let initialHeight = iframe.offsetHeight;
   let padding = 50;
-  console.log("Initial height > ", initialHeight);
 
   window.onmessage = (event) => {
     if (event.origin.match(/postco\.co/)) {
-      console.log("Parent received---", event.data);
-
       let { type, height, isRoot, resetHeight } = event.data;
       height += padding;
 
@@ -30,13 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
         } else if (shouldResize && height > iframe.offsetHeight) {
           iframe.style.height = height + "px";
         }
+        repositionStickyBottomAppBar()
       } else if (type === "scrollToTop") {
         window.scrollTo(0, 0);
         iframe.scrollTo(0, 0);
       } else if (type === "scrollUp") {
         window.scrollTo({
           top: 0,
-          behavior: "smooth"
+          behavior: "smooth",
         });
       } else if (type === "scrollDown") {
         const iframeBottom = iframe.scrollHeight;
@@ -46,8 +61,10 @@ document.addEventListener("DOMContentLoaded", function () {
           top: iframeBottom - viewportHeight + 300,
           // Scroll down a little further (300px), so the users
           // can see there is a footer below
-          behavior: "smooth"
+          behavior: "smooth",
         });
+      } else if (type === "stickyBottomAppBarReposition") {
+        repositionStickyBottomAppBar();
       }
     }
   };
