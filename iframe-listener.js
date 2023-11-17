@@ -5,8 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (params.has("disable-resize-observer") || !iframe) return;
 
   addEventListener("scroll", () => {
-    const viewportBottom =
-      window.scrollY + document.documentElement.clientHeight;
+    const viewportBottom = window.scrollY + window.innerHeight;
     const iframeBottom = iframe.offsetTop + iframe.offsetHeight;
 
     iframe.contentWindow.postMessage(
@@ -14,38 +13,21 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "stickyBottomAppBarPosition",
         data: viewportBottom < iframeBottom ? iframeBottom - viewportBottom : 0,
       },
-      "*"
+      "*",
     );
   });
   const repositionStickyBottomAppBar = () => {
-    window.dispatchEvent(new CustomEvent('scroll'));
+    window.dispatchEvent(new CustomEvent("scroll"));
   };
 
-  let shouldResize = true;
-  let initialHeight = iframe.offsetHeight;
   let padding = 50;
 
   window.onmessage = (event) => {
     if (event.origin.match(/postco\.co/)) {
-      let { type, height, isRoot, resetHeight } = event.data;
+      let { type, height } = event.data;
       height += padding;
 
-      if (type === "resize") {
-        if (
-          shouldResize &&
-          isRoot &&
-          iframe.offsetHeight - height > 0 &&
-          (iframe.offsetHeight - height) / iframe.offsetHeight > 0.3
-        ) {
-          iframe.style.height = `${initialHeight}px`;
-        } else if (resetHeight) {
-          shouldResize = false;
-          iframe.style.height = `${initialHeight}px`;
-        } else if (shouldResize && height > iframe.offsetHeight) {
-          iframe.style.height = height + "px";
-        }
-        repositionStickyBottomAppBar()
-      } else if (type === "scrollToTop") {
+      if (type === "scrollToTop") {
         window.scrollTo(0, 0);
         iframe.scrollTo(0, 0);
       } else if (type === "scrollUp") {
@@ -58,8 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const viewportHeight = window.innerHeight;
 
         window.scrollBy({
-          top: iframeBottom - viewportHeight + 300,
-          // Scroll down a little further (300px), so the users
+          top: iframeBottom - viewportHeight + 150,
+          // Scroll down a little further (150px), so the users
           // can see there is a footer below
           behavior: "smooth",
         });
