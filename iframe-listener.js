@@ -22,32 +22,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let padding = 50;
 
-  window.onmessage = (event) => {
-    if (event.origin.match(/postco\.co/)) {
-      let { type, height } = event.data;
-      height += padding;
+  const iframeFullscreenStyle = {
+    width: "100vw",
+    height: "100dvh",
+    position: "fixed",
+    top: "0",
+    left: "0",
+    zIndex: "3",
+  };
 
-      if (type === "scrollToTop") {
+  window.onmessage = (event) => {
+    if (!event.origin.match(/postco\.co/)) {
+      return;
+    }
+
+    let { type, height } = event.data;
+    height += padding;
+
+    switch (type) {
+      case "scrollToTop":
         window.scrollTo(0, 0);
         iframe.scrollTo(0, 0);
-      } else if (type === "scrollUp") {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      } else if (type === "scrollDown") {
+        break;
+      case "scrollUp":
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        break;
+      case "scrollDown":
         const iframeBottom = iframe.scrollHeight;
         const viewportHeight = window.innerHeight;
 
+        // Scroll down a little further (150px), so the users
+        // can see there is a footer below
         window.scrollBy({
           top: iframeBottom - viewportHeight + 150,
           // Scroll down a little further (150px), so the users
           // can see there is a footer below
           behavior: "smooth",
         });
-      } else if (type === "stickyBottomAppBarReposition") {
+        break;
+      case "stickyBottomAppBarReposition":
         repositionStickyBottomAppBar();
-      }
+        break;
+      case "enterFullscreen":
+        Object.entries(iframeFullscreenStyle).forEach(
+          ([property, value]) => (iframe.style[property] = value),
+        );
+        break;
+      case "exitFullscreen":
+        Object.entries(iframeFullscreenStyle).forEach(
+          ([property, _]) => (iframe.style[property] = ""),
+        );
+        break;
     }
   };
 });
