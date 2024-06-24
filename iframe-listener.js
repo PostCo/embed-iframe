@@ -1,6 +1,24 @@
+function getHeaderElementByRegex() {
+  const allElements = document.querySelectorAll("*");
+  const pattern = /^shopify-section-sections--\d+__header.*$/;
+  let headerElement;
+
+  for (let i = 0; i < allElements.length; i++) {
+    if (pattern.test(allElements[i].id)) {
+      headerElement = allElements[i];
+      break;
+    }
+  }
+
+  return headerElement;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const iframe = document.querySelector("#postco360-iframe");
   const params = new URLSearchParams(window.location.search);
+  const headerElement =
+    document.getElementById("shopify-section-header") ||
+    getHeaderElementByRegex();
 
   if (params.has("disable-resize-observer") || !iframe) return;
 
@@ -13,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "stickyBottomAppBarPosition",
         data: viewportBottom < iframeBottom ? iframeBottom - viewportBottom : 0,
       },
-      "*",
+      "*"
     );
   });
   const repositionStickyBottomAppBar = () => {
@@ -32,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   window.onmessage = (event) => {
-    if (!event.origin.match(/postco\.co/)) {
+    if (!event.origin.match(/(postco\.co|localhost)/)) {
       return;
     }
 
@@ -65,13 +83,19 @@ document.addEventListener("DOMContentLoaded", function () {
         break;
       case "enterFullscreen":
         Object.entries(iframeFullscreenStyle).forEach(
-          ([property, value]) => (iframe.style[property] = value),
+          ([property, value]) => (iframe.style[property] = value)
         );
         break;
       case "exitFullscreen":
         Object.entries(iframeFullscreenStyle).forEach(
-          ([property, _]) => (iframe.style[property] = ""),
+          ([property, _]) => (iframe.style[property] = "")
         );
+        break;
+      case "showShopifyHeader":
+        if (headerElement) headerElement.style.display = "";
+        break;
+      case "hideShopifyHeader":
+        if (headerElement) headerElement.style.display = "none";
         break;
     }
   };
