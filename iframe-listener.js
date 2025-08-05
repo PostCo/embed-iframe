@@ -20,19 +20,23 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("shopify-section-header") ||
     getHeaderElementByRegex();
 
-  if (params.has("postco_redirect_path") && iframe) {
-    const redirectPath = params.get("postco_redirect_path");
+  if (iframe) {
     const currentSrc = iframe.src;
     const url = new URL(currentSrc);
 
-    if (redirectPath.includes("?")) {
-      const [pathname, queryString] = redirectPath.split("?");
-      url.pathname = pathname;
-      url.search = queryString;
-    } else {
-      url.pathname = redirectPath;
+    if (params.has("postco_redirect_path")) {
+      const redirectPath = params.get("postco_redirect_path");
+      
+      if (redirectPath.includes("?")) {
+        const [pathname, queryString] = redirectPath.split("?");
+        url.pathname = pathname;
+        url.search = queryString;
+      } else {
+        url.pathname = redirectPath;
+      }
     }
-    
+
+    url.searchParams.set("parentUrl", window.location.href);
     iframe.src = url.toString();
   }
 
