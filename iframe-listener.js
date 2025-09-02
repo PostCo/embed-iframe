@@ -21,12 +21,23 @@ document.addEventListener("DOMContentLoaded", function () {
     getHeaderElementByRegex();
 
   if (iframe) {
+    // Create new iframe with correct src to avoid reload
+    const newIframe = document.createElement("iframe");
+
+    // Copy all attributes from existing iframe except src
+    Array.from(iframe.attributes).forEach((attr) => {
+      if (attr.name !== "src") {
+        newIframe.setAttribute(attr.name, attr.value);
+      }
+    });
+
+    // Build the correct URL
     const currentSrc = iframe.src;
     const url = new URL(currentSrc);
 
     if (params.has("postco_redirect_path")) {
       const redirectPath = params.get("postco_redirect_path");
-      
+
       if (redirectPath.includes("?")) {
         const [pathname, queryString] = redirectPath.split("?");
         url.pathname = pathname;
@@ -37,7 +48,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     url.searchParams.set("parentUrl", window.location.href);
-    iframe.src = url.toString();
+
+    // Set the correct src on the new iframe
+    newIframe.src = url.toString();
+
+    // Replace the existing iframe with the new one
+    iframe.parentNode.replaceChild(newIframe, iframe);
+
+    // Update iframe reference for the rest of the script
+    iframe = newIframe;
   }
 
   if (params.has("disable-resize-observer") || !iframe) return;
@@ -51,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
         type: "stickyBottomAppBarPosition",
         data: viewportBottom < iframeBottom ? iframeBottom - viewportBottom : 0,
       },
-      "*"
+      "*",
     );
   });
   const repositionStickyBottomAppBar = () => {
@@ -103,12 +122,12 @@ document.addEventListener("DOMContentLoaded", function () {
         break;
       case "enterFullscreen":
         Object.entries(iframeFullscreenStyle).forEach(
-          ([property, value]) => (iframe.style[property] = value)
+          ([property, value]) => (iframe.style[property] = value),
         );
         break;
       case "exitFullscreen":
         Object.entries(iframeFullscreenStyle).forEach(
-          ([property, _]) => (iframe.style[property] = "")
+          ([property, _]) => (iframe.style[property] = ""),
         );
         break;
       case "showShopifyHeader":

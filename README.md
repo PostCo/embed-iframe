@@ -21,17 +21,9 @@ The parent window contains this JS code for listening to postMessages {object} s
 ```
 
 ### How to push a new version to jsdelivr
-- Make change(s) to the code, push it to the remote repo as usually.
-- Once all the changes have been made, update the minified version of all the `.js` files.
-  - You can look for online JavaScript minifiers online like [Toptal's JavaScript Minifier](https://www.toptal.com/developers/javascript-minifier)
-- Once the new code is merged into the `main` branch, draft a new release.
-  - Visit the repo on GitHub, go to Releases section (it sits between the About section and Packages section).
-  - Click "Draft a new release".
-  - Fill in the fields:
-    - Tag: create a new, incremented tag. For example, the latest release is `v1.0.4`, then the tag should be `v1.0.5`.
-    - Target: the main branch.
-    - Relase title: same as Tag.
-    - Description: self-explanatory.
-  - Check the "Set as the latest release".
-  - Click on "Draft a new release".
-- Once everything is reviewed and tested carefully, go to the Releases section, click on Edit icon of the draft release and click "Publish release".
+- Make change(s) to any `.js` files and push to the `main` branch.
+- The GitHub Action will automatically:
+  - Minify all JavaScript files using Terser
+  - Commit the minified files back to the repository
+  - Create a new release with an incremented version tag (e.g., `v1.0.4` → `v1.0.5`)
+  - Make the new version available on jsDelivr CDN

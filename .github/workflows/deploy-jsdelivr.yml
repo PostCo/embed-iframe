@@ -1,0 +1,100 @@
+name: Deploy to jsDelivr
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.js'
+      - '!**.min.js'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: npm install -g terser
+    
+    - name: Minify JavaScript files
+      run: |
+        for file in *.js; do
+          if [[ ! "$file" == *.min.js ]]; then
+            echo "Minifying $file"
+            terser "$file" --compress --mangle --output "${file%.js}.min.js"
+          fi
+        done
+    
+    - name: Check if files changed
+      id: changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add *.min.js
+        if git diff --staged --quiet; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+          echo "No changes to minified files"
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "Minified files have changes"
+        fi
+    
+    - name: Commit minified files
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        git commit -m "Auto-update minified files [skip ci]"
+        git push
+    
+    - name: Get latest tag
+      id: latest_tag
+      run: |
+        latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+        echo "tag=$latest_tag" >> $GITHUB_OUTPUT
+        echo "Latest tag: $latest_tag"
+    
+    - name: Increment version
+      id: increment
+      run: |
+        latest_tag="${{ steps.latest_tag.outputs.tag }}"
+        
+        # Remove 'v' prefix if present
+        version=${latest_tag#v}
+        
+        # Split version into array
+        IFS='.' read -ra VERSION_PARTS <<< "$version"
+        major=${VERSION_PARTS[0]:-1}
+        minor=${VERSION_PARTS[1]:-0}
+        patch=${VERSION_PARTS[2]:-0}
+        
+        # Increment patch version
+        new_patch=$((patch + 1))
+        new_version="v$major.$minor.$new_patch"
+        
+        echo "new_version=$new_version" >> $GITHUB_OUTPUT
+        echo "New version: $new_version"
+    
+    - name: Create Release
+      if: steps.changes.outputs.changed == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ steps.increment.outputs.new_version }}" \
+          --title "${{ steps.increment.outputs.new_version }}" \
+          --notes "## Changes
+        - Auto-updated minified JavaScript files
+        - Deploy to jsDelivr CDN
+        
+        ### Usage
+        \`\`\`html
+        <script src=\"https://cdn.jsdelivr.net/gh/PostCo/embed-iframe@${{ steps.increment.outputs.new_version }}/iframe-listener.min.js\"></script>
+        \`\`\`"
